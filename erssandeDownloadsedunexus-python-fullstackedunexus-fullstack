@@ -1,0 +1,156 @@
+[33mcommit 115ef3f0c420445186f0ba639313713eb29a7110[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Sandeep <sandeep@users.noreply.github.com>
+Date:   Sat Sep 5 13:58:07 2026 +0530
+
+    Initial EduNexus full-stack application
+
+[1mdiff --git a/.gitignore b/.gitignore[m
+[1mnew file mode 100644[m
+[1mindex 0000000..14120ef[m
+[1m--- /dev/null[m
+[1m+++ b/.gitignore[m
+[36m@@ -0,0 +1,16 @@[m
+[32m+[m[32m# Backend[m
+[32m+[m[32mbackend/.venv/[m
+[32m+[m[32mbackend/__pycache__/[m
+[32m+[m[32mbackend/app/__pycache__/[m
+[32m+[m[32mbackend/app/routers/__pycache__/[m
+[32m+[m[32mbackend/*.db[m
+[32m+[m[32mbackend/.env[m
+[32m+[m
+[32m+[m[32m# Frontend[m
+[32m+[m[32mfrontend/node_modules/[m
+[32m+[m[32mfrontend/dist/[m
+[32m+[m[32mfrontend/.env[m
+[32m+[m
+[32m+[m[32m# OS / editor[m
+[32m+[m[32m.DS_Store[m
+[32m+[m[32m*.pyc[m
+[1mdiff --git a/README.md b/README.md[m
+[1mnew file mode 100644[m
+[1mindex 0000000..31bec2c[m
+[1m--- /dev/null[m
+[1m+++ b/README.md[m
+[36m@@ -0,0 +1,151 @@[m
+[32m+[m[32m# EduNexus AI — Python Track[m
+[32m+[m
+[32m+[m[32mA full-stack, Python-only adaptive learning platform: a real knowledge-graph[m
+[32m+[m[32mcurriculum, a quiz engine that updates mastery scores, an AI career-match[m
+[32m+[m[32mengine, an auto-generated roadmap, and a REPL-style tutor that adapts its[m
+[32m+[m[32mexplanation depth to what you actually know.[m
+[32m+[m
+[32m+[m[32mThis is the **core loop, built end to end** — not a mockup. Every button[m
+[32m+[m[32mcalls a real API backed by a real database.[m
+[32m+[m
+[32m+[m[32m```[m
+[32m+[m[32mbackend/   FastAPI + SQLAlchemy + JWT auth (SQLite by default, Postgres-ready)[m
+[32m+[m[32mfrontend/  React + Vite, talks to the backend over a REST API[m
+[32m+[m[32m```[m
+[32m+[m
+[32m+[m[32m## What's real vs. what's a deliberate simplification[m
+[32m+[m
+[32m+[m[32m- **Real**: JWT auth, password hashing, a relational schema, server-side[m
+[32m+[m[32m  scoring/recommendation/roadmap logic, persistent per-user knowledge state,[m
+[32m+[m[32m  CORS, environment-based config.[m
+[32m+[m[32m- **Mock "AI"**: there's no LLM call and no trained ML model. The "AI" is[m
+[32m+[m[32m  deterministic logic — weighted scoring, a prerequisite-graph traversal,[m
+[32m+[m[32m  rule-based recommendations with explicit explanations. This is intentional:[m
+[32m+[m[32m  it's honest, fully explainable, and demoable with zero API keys. Swapping[m
+[32m+[m[32m  in a real model later (e.g. for the tutor) means replacing `tutor_respond()`[m
+[32m+[m[32m  in `backend/app/engine.py` with an LLM call — the rest of the architecture[m
+[32m+[m[32m  doesn't need to change.[m
+[32m+[m[32m- **Trust model for quizzes**: to keep instant feedback (see the correct[m
+[32m+[m[32m  answer and explanation the moment you pick one, like most learning apps),[m
+[32m+[m[32m  the quiz-generation endpoint sends the correct answer to the client, and[m
+[32m+[m[32m  the client reports back which questions it got right. A production[m
+[32m+[m[32m  version handling graded/high-stakes assessments would grade purely[m
+[32m+[m[32m  server-side and never send the answer key to the browser.[m
+[32m+[m
+[32m+[m[32m## Quick start[m
+[32m+[m
+[32m+[m[32m### 1. Backend (FastAPI)[m
+[32m+[m
+[32m+[m[32m```bash[m
+[32m+[m[32mcd backend[m
+[32m+[m[32mpython3 -m venv .venv[m
+[32m+[m[32msource .venv/bin/activate        # Windows: .venv\Scripts\activate[m
+[32m+[m[32mpip install -r requirements.txt[m
+[32m+[m[32mcp .env.example .env             # edit JWT_SECRET before any real deployment[m
+[32m+[m[32muvicorn app.main:app --reload --port 8000[m
+[32m+[m[32m```[m
+[32m+[m
+[32m+[m[32mOr just run `./run.sh` (creates the venv, installs, and starts it).[m
+[32m+[m
+[32m+[m[32mThe API is now at `http://localhost:8000` — interactive docs at[m
+[32m+[m[32m`http://localhost:8000/docs`. On first boot it creates `edunexus.db`[m
+[32m+[m[32m(SQLite) and seeds a demo student automatically.[m
+[32m+[m
+[32m+[m[32m### 2. Frontend (React + Vite)[m
+[32m+[m
+[32m+[m[32m```bash[m
+[32m+[m[32mcd frontend[m
+[32m+[m[32mnpm install[m
+[32m+[m[32mcp .env.example .env             # only needed if the backend isn't on :8000[m
+[32m+[m[32mnpm run dev[m
+[32m+[m[32m```[m
+[32m+[m
+[32m+[m[32mOpen `http://localhost:5173`. Click **"Try instant demo"** to log in as a[m
+[32m+[m[32mpre-populated demo student with realistic mastery data, or register a real[m
+[32m+[m[32maccount and start from a blank knowledge state.[m
+[32m+[m
+[32m+[m[32m### Switching to Postgres[m
+[32m+[m
+[32m+[m[32mEdit `backend/.env`:[m
+[32m+[m
+[32m+[m[32m```[m
+[32m+[m[32mDATABASE_URL=postgresql://user:password@localhost:5432/edunexus[m
+[32m+[m[32m```[m
+[32m+[m
+[32m+[m[32mThen uncomment `psycopg2-binary` in `requirements.txt` and reinstall. No[m
+[32m+[m[32mcode changes needed — SQLAlchemy handles both dialects identically here.[m
+[32m+[m
+[32m+[m[32m## What's implemented (core loop, done properly)[m
+[32m+[m
+[32m+[m[32m- **Auth**: register / login / instant demo login, JWT bearer tokens,[m
+[32m+[m[32m  bcrypt password hashing.[m
+[32m+[m[32m- **Knowledge graph**: 20 Python concepts (syntax → data types → control[m
+[32m+[m[32m  flow → functions → OOP → decorators/algorithms) as a real prerequisite[m
+[32m+[m[32m  DAG, rendered as an interactive node graph.[m
+[32m+[m[32m- **Quiz engine**: 40-question bank across all 20 concepts, filterable by[m
+[32m+[m[32m  topic/difficulty/count, server-recorded attempts, live mastery updates.[m
+[32m+[m[32m- **Career AI**: 5 Python-track roles with weighted skill requirements,[m
+[32m+[m[32m  computed match %, and skill-gap breakdowns.[m
+[32m+[m[32m- **Roadmap**: auto-generated month-by-month plan from the real[m
+[32m+[m[32m  prerequisite closure of whichever career goal you set.[m
+[32m+[m[32m- **Nexus Tutor**: keyword-matches your question to a concept and replies[m
+[32m+[m[32m  at beginner/intermediate/advanced depth based on your mastery of that[m
+[32m+[m[32m  specific topic — with chat history persisted per user.[m
+[32m+[m[32m- **Dashboard**: streak, knowledge score, placement readiness, top career[m
+[32m+[m[32m  match, today's plan, knowledge-decay alerts, and explainable[m
+[32m+[m[32m  recommendations ("why am I seeing this?" shows the actual factors used).[m
+[32m+[m
+[32m+[m[32m## What's intentionally out of scope for this build[m
+[32m+[m
+[32m+[m[32mPer the agreed scope, this ships the **core loop only** — dashboard,[m
+[32m+[m[32mknowledge graph, AI tutor, quiz, career match, roadmap. The wider original[m
+[32m+[m[32mspec (marketplace, mentorship, faculty/admin dashboards, resume analyzer,[m
+[32m+[m[32minterview simulator, company-prep modules, etc.) is not built here. The[m
+[32m+[m[32marchitecture (routers, engine module, curriculum data) is structured so[m
+[32m+[m[32mthose could be added as new routers + frontend pages without restructuring[m
+[32m+[m[32mwhat exists.[m
+[32m+[m
+[32m+[m[32m## Project layout[m
+[32m+[m
+[32m+[m[32m```[m
+[32m+[m[32mbackend/[m
+[32m+[m[32m  app/[m
+[32m+[m[32m    main.py            FastAPI app, CORS, startup seeding[m
+[32m+[m[32m    config.py           Env-based settings[m
+[32m+[m[32m    database.py          SQLAlchemy engine/session[m
+[32m+[m[32m    models.py             ORM tables: users, knowledge_states, quiz_attempts, chat_messages[m
+[32m+[m[32m    schemas.py             Pydantic request/response models[m
+[32m+[m[32m    security.py              Password hashing + JWT[m
+[32m+[m[32m    auth.py                    get_current_user dependency[m
+[32m+[m[32m    curriculum.py                Concept DAG, careers, projects, tutor content[m
+[32m+[m[32m    questions.py                  Quiz question bank[m
+[32m+[m[32m    engine.py                      Scoring / recommendation / roadmap / tut
